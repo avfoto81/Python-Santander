@@ -70,6 +70,6 @@ venv/               # Ambiente virtual (opcional, não incluído no controle de 
 ```
 
 ## Autor
-Projeto desenvolvido por **André Luiz** com base no curso **Python Santander**.
+Projeto desenvolvido por **André Luiz** com base no curso **Santander one Academy**.
 
 
