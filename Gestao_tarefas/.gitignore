@@ -1,0 +1,19 @@
+# Arquivo JSON com as tarefas (dados do usuário)
+tarefas.json
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambiente virtual
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+

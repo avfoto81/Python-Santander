@@ -1,0 +1,30 @@
+{
+  "tarefas": [
+    {
+      "id": 1,
+      "texto": "Trabalhar na edição",
+      "completa": true
+    },
+    {
+      "id": 2,
+      "texto": "Estudar english",
+      "completa": false
+    },
+    {
+      "id": 3,
+      "texto": "Estudar Python",
+      "completa": false
+    },
+    {
+      "id": 4,
+      "texto": "Fazer café",
+      "completa": false
+    },
+    {
+      "id": 5,
+      "texto": "Academia",
+      "completa": false
+    }
+  ],
+  "proximo_id": 6
+}

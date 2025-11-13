@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Tarefas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .tarefas-lista {
+            margin-bottom: 30px;
+        }
+
+        .mensagem-vazia {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .tarefa-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .tarefa-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tarefa-info {
+            flex: 1;
+        }
+
+        .tarefa-id {
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .tarefa-texto {
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .tarefa-status {
+            margin-left: 15px;
+            font-weight: bold;
+        }
+
+        .status-completa {
+            color: #28a745;
+        }
+
+        .status-pendente {
+            color: #dc3545;
+        }
+
+        .btn-acoes {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-completar, .btn-editar, .btn-excluir {
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 0.9em;
+        }
+
+        .btn-completar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-completar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-editar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-editar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-excluir {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .btn-excluir:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(250, 112, 154, 0.4);
+        }
+
+        .form-container {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button[type="submit"]:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #eee;
+            margin: 30px 0;
+        }
+
+        /* Modal para edição */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-form input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .modal-form input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-salvar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .btn-salvar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-cancelar {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .btn-cancelar:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Lista de Tarefas</h1>
+        
+        <div class="tarefas-lista">
+            {% if tarefas %}
+                <ul>
+                    {% for tarefa in tarefas %}
+                    <li class="tarefa-item">
+                        <div class="tarefa-info">
+                            <span class="tarefa-id">ID: {{ tarefa.id }}</span>
+                            <span class="tarefa-texto">{{ tarefa.texto }}</span>
+                            <span class="tarefa-status {% if tarefa.completa %}status-completa{% else %}status-pendente{% endif %}">
+                                {% if tarefa.completa %}
+                                    ✅ Completa
+                                {% else %}
+                                    ❌ Pendente
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="btn-acoes">
+                            {% if not tarefa.completa %}
+                                <a href="/completar/{{ tarefa.id }}" class="btn-completar">Completar</a>
+                            {% endif %}
+                            <button class="btn-editar" data-id="{{ tarefa.id }}" data-texto="{{ tarefa.texto|e }}">Editar</button>
+                            <a href="/excluir/{{ tarefa.id }}" class="btn-excluir" onclick="return confirm('Tem certeza que deseja excluir esta tarefa?')">Excluir</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="mensagem-vazia">
+                    <p>Nenhuma tarefa cadastrada.</p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">Adicione uma nova tarefa abaixo para começar!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <hr>
+
+        <div class="form-container">
+            <h2>➕ Adicionar Nova Tarefa</h2>
+            <form action="/adicionar" method="get">
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        name="texto" 
+                        placeholder="Digite a descrição da tarefa..." 
+                        required
+                        autofocus
+                    >
+                    <button type="submit">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para edição de tarefa -->
+    <div id="modalEdicao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Tarefa</h2>
+                <span class="close" onclick="fecharModal()">&times;</span>
+            </div>
+            <form action="/editar" method="post" class="modal-form">
+                <input type="hidden" id="edit-id" name="id" value="">
+                <input type="text" id="edit-texto" name="texto" placeholder="Digite o novo texto da tarefa..." required autofocus>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn-salvar">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Função para abrir o modal de edição
+        function abrirModalEdicao(id, texto) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-texto').value = texto;
+            document.getElementById('modalEdicao').style.display = 'block';
+            document.getElementById('edit-texto').focus();
+        }
+
+        // Função para fechar o modal
+        function fecharModal() {
+            document.getElementById('modalEdicao').style.display = 'none';
+        }
+
+        // Adiciona event listeners para os botões de editar
+        document.addEventListener('DOMContentLoaded', function() {
+            const botoesEditar = document.querySelectorAll('.btn-editar');
+            botoesEditar.forEach(function(botao) {
+                botao.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const texto = this.getAttribute('data-texto');
+                    abrirModalEdicao(id, texto);
+                });
+            });
+        });
+
+        // Fechar o modal quando clicar fora dele
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalEdicao');
+            if (event.target == modal) {
+                fecharModal();
+            }
+        }
+
+        // Fechar o modal com a tecla ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                fecharModal();
+            }
+        });
+    </script>
+</body>
+</html>
+
